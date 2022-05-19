@@ -11,16 +11,14 @@ import (
 
 func main() {
 
-	// LINE bot クライアント生成
-	bot, err := linebot.New(
-		os.Getenv("LINE_BOT_CHANNEL_SECRET"),
-		os.Getenv("LINE_BOT_CHANNEL_TOKEN"),
-	)
-	// エラー時はログ出力
+	ChanellSecret := "前節で発行したチャネルシークレットの値"
+	ChanellToken := "前節で発行したチャネルアクセストークン（長期）の値"
+	bot, err := linebot.New(ChanellSecret, ChanellToken)
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	// Setup HTTP Server for receiving requests from LINE platform
 	http.HandleFunc("/callback", func(w http.ResponseWriter, req *http.Request) {
 		events, err := bot.ParseRequest(req)
 		if err != nil {
@@ -48,7 +46,8 @@ func main() {
 			}
 		}
 	})
-
+	// This is just sample code.
+	// For actual use, you must support HTTPS by using `ListenAndServeTLS`, a reverse proxy or something else.
 	if err := http.ListenAndServe(":"+os.Getenv("PORT"), nil); err != nil {
 		log.Fatal(err)
 	}

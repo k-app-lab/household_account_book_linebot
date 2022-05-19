@@ -11,9 +11,7 @@ import (
 
 func main() {
 
-	ChanellSecret := "前節で発行したチャネルシークレットの値"
-	ChanellToken := "前節で発行したチャネルアクセストークン（長期）の値"
-	bot, err := linebot.New(ChanellSecret, ChanellToken)
+	bot, err := linebot.New(os.Getenv("LINE_BOT_CHANNEL_SECRET"), os.Getenv("LINE_BOT_CHANNEL_TOKEN"))
 	if err != nil {
 		log.Fatal(err)
 	}

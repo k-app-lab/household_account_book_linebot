@@ -7,14 +7,9 @@ import (
 	"os"
 
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/joho/godotenv"
 )
 
 func MysqlSample() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal(err)
-	}
 	db, err := sql.Open("mysql", os.Getenv("DB_ROLE")+":"+os.Getenv("DB_PASSWORD")+"@/"+os.Getenv("DB_NAME"))
 	if err != nil {
 		log.Fatal(err)

@@ -10,7 +10,7 @@ import (
 	"github.com/joho/godotenv"
 )
 
-func mysqlSample() {
+func MysqlSample() {
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal(err)

@@ -6,11 +6,15 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/ko-app-lab/household_account_book_linebot/mypkg"
 
 	"github.com/line/line-bot-sdk-go/linebot"
 )
 
 func main() {
+
+	mypkg.MysqlSample()
+
 	port := os.Getenv("PORT")
 
 	if port == "" {

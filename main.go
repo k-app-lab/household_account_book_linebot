@@ -13,7 +13,7 @@ import (
 
 func main() {
 
-	mypkg.MysqlSample()
+	mypkg.SQLSample()
 
 	port := os.Getenv("PORT")
 

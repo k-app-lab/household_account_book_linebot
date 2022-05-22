@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"os"
 
 	_ "github.com/lib/pq"
 )
@@ -14,7 +15,7 @@ type Sale struct {
 }
 
 func SQLSample() {
-	db, err := sql.Open("postgres", "postgres://user:pass@host:port/dbname")
+	db, err := sql.Open("postgres", os.Getenv("DATABASE_URL"))
 	if err != nil {
 		log.Fatalln("接続失敗", err)
 	}

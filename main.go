@@ -1,8 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -13,7 +15,7 @@ import (
 
 func main() {
 
-	mypkg.SQLSample()
+	fmt.Println(mypkg.SearchDatabase("こたんこ"))
 
 	port := os.Getenv("PORT")
 
@@ -89,6 +91,12 @@ func main() {
 						// 地図表示されるケース
 					} else if strings.Contains(replyMessage, replyLocation) {
 						bot.ReplyMessage(event.ReplyToken, responseLocation).Do()
+					}
+					id, err := mypkg.SearchDatabase(replyMessage)
+					if err == nil {
+						bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(strconv.Itoa(id))).Do()
+					} else {
+						log.Print(err)
 					}
 					// 上記意外は、おうむ返しで返信
 					_, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(replyMessage)).Do()

@@ -10,8 +10,8 @@ import (
 )
 
 type User struct {
-	id   int
-	name string
+	Id   int
+	Name string
 }
 
 func SQLSample() {
@@ -21,15 +21,23 @@ func SQLSample() {
 	}
 	defer db.Close()
 
-	// 取得件数を条件[$1]にする
-	// ?だとエラーが発生
-	//cmd := "select id, order_id from final_sales where id like $1"
 	cmd := "select * from mybook;"
-	//取得するデータが1件の場合は、QueryRowも利用できる
-	rows, err := db.Query(cmd, "T00%")
+	rows, err := db.Query(cmd)
 	if err != nil {
-		fmt.Println("クエリ取得失敗")
+		log.Fatalln("クエリ取得失敗", err)
 	}
 	defer rows.Close()
 
+	var user User
+	for rows.Next() {
+		err := rows.Scan(&user.Id, &user.Name)
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Printf("ID: %d, Name: %s\n", user.Id, user.Name)
+	}
+	err = rows.Err()
+	if err != nil {
+		log.Fatal(err)
+	}
 }

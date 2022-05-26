@@ -2,6 +2,7 @@ package mypkg
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 	"os"
 
@@ -25,7 +26,10 @@ func SQLSample() {
 	//cmd := "select id, order_id from final_sales where id like $1"
 	cmd := "select * from mybook;"
 	//取得するデータが1件の場合は、QueryRowも利用できる
-	rows, _ := db.Query(cmd, "T00%")
+	rows, err := db.Query(cmd, "T00%")
+	if err != nil {
+		fmt.Println("クエリ取得失敗")
+	}
 	defer rows.Close()
 
 }

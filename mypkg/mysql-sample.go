@@ -2,14 +2,13 @@ package mypkg
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
 	"os"
 
 	_ "github.com/lib/pq"
 )
 
-type Sale struct {
+type User struct {
 	id   int
 	name string
 }
@@ -27,7 +26,6 @@ func SQLSample() {
 	cmd := "select * from mybook;"
 	//取得するデータが1件の場合は、QueryRowも利用できる
 	rows, _ := db.Query(cmd, "T00%")
-	fmt.Println(rows)
 	defer rows.Close()
 
 }

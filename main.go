@@ -1,10 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
-	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/ko-app-lab/household_account_book_linebot/mypkg"
@@ -13,11 +11,7 @@ import (
 )
 
 func main() {
-
-	fmt.Println(mypkg.SearchDatabase("こたんこ"))
-
 	port := os.Getenv("PORT")
-
 	if port == "" {
 		log.Fatal("$PORT must be set")
 	}
@@ -34,6 +28,7 @@ func main() {
 
 	// LINE Messaging API ルーティング
 	router.POST("/callback", func(c *gin.Context) {
+		// Lineでメッセージを取得
 		events, err := bot.ParseRequest(c.Request)
 		if err != nil {
 			if err == linebot.ErrInvalidSignature {
@@ -42,14 +37,6 @@ func main() {
 			return
 		}
 
-		// "可愛い" 単語を含む場合、返信される
-		var replyText string
-		replyText = "可愛い"
-
-		// チャットの回答
-		var response string
-		response = "ありがとう！！"
-
 		for _, event := range events {
 			// イベントがメッセージの受信だった場合
 			if event.Type == linebot.EventTypeMessage {
@@ -57,12 +44,7 @@ func main() {
 				// メッセージがテキスト形式の場合
 				case *linebot.TextMessage:
 					replyMessage := message.Text
-					// テキストで返信されるケース
-					if strings.Contains(replyMessage, replyText) {
-						bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(response)).Do()
-						// スタンプで返信されるケース
-					}
-					loginMessage, err := mypkg.SearchDatabase(replyMessage)
+					loginMessage, err := mypkg.FetchLoginMessage(replyMessage)
 					if loginMessage != "" && err == nil {
 						bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(loginMessage)).Do()
 					} else {

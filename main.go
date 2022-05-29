@@ -1,12 +1,14 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	mydb "github.com/ko-app-lab/household_account_book_linebot/my-database"
 	myMessage "github.com/ko-app-lab/household_account_book_linebot/my-message"
 	"github.com/ko-app-lab/household_account_book_linebot/mypkg"
 
@@ -25,6 +27,16 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	// 登録されているユーザ名を取得する
+	users, err := mydb.FetchUserName()
+	if err != nil {
+		log.Fatal(err)
+	}
+	for _, user := range users {
+		fmt.Println(user)
+	}
+	fmt.Println()
 
 	router := gin.New()
 	router.Use(gin.Logger())
@@ -49,6 +61,7 @@ func main() {
 					replyMessage := message.Text
 					// ログイン時の返信
 					myMessage.ReplyLogin(bot, event, replyMessage)
+					// 「ユーザ名,操作」の形かチェック
 					if checkRegisterMessage(replyMessage) {
 						name := splitMessages(replyMessage)[0]
 						point, err := mypkg.UpdatePoint(name)
@@ -82,12 +95,6 @@ func checkRegisterMessage(message string) bool {
 	// 二分割以外は不明なメッセージ
 	if len(splitMessages) != 2 {
 		return false
-	}
-	// 家事名が一つでも一致すればtrue
-	for _, kind := range houseHoldKinds {
-		if kind == splitMessages[1] {
-			return true
-		}
 	}
 	return false
 }

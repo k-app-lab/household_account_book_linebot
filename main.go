@@ -4,10 +4,8 @@ import (
 	"log"
 	"os"
 
-	"math/rand"
-	"time"
-
 	"github.com/gin-gonic/gin"
+	myMessage "github.com/ko-app-lab/household_account_book_linebot/my-message"
 	"github.com/ko-app-lab/household_account_book_linebot/mypkg"
 
 	"github.com/line/line-bot-sdk-go/linebot"
@@ -63,32 +61,11 @@ func main() {
 						bot.ReplyMessage(event.ReplyToken, linebot.NewTemplateMessage(askTitle, template)).Do()
 					} else {
 						// 上記以外は、不明なメッセージとして返信
-						replyUndefineMessage(bot, event)
+						myMessage.ReplyUndefined(bot, event)
 					}
 				}
 			}
 		}
 	})
 	router.Run(":" + port)
-}
-
-// 不明なメッセージを取得したときの返信
-var undefinedMessage = []string{
-	"ちょっと何言っているかわかんない...",
-	"日本語話してもろてもいいですか？",
-	"すみません、よくわかりません",
-	"管理者に使い方教えてもらえ",
-}
-
-func replyUndefineMessage(bot *linebot.Client, event *linebot.Event) {
-	_, err := bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(generateRandamUndefineMessage())).Do()
-	if err != nil {
-		log.Print(err)
-	}
-}
-
-func generateRandamUndefineMessage() string {
-	rand.Seed(time.Now().UnixNano())
-	randIndex := rand.Intn((len(undefinedMessage) - 1))
-	return undefinedMessage[randIndex]
 }

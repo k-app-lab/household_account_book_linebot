@@ -3,6 +3,8 @@ package main
 import (
 	"log"
 	"os"
+	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	myMessage "github.com/ko-app-lab/household_account_book_linebot/my-message"
@@ -10,12 +12,6 @@ import (
 
 	"github.com/line/line-bot-sdk-go/linebot"
 )
-
-var householdActions = []linebot.TemplateAction{
-	linebot.NewMessageAction("Say message", "洗濯"),
-	linebot.NewMessageAction("Say message", "掃除"),
-	linebot.NewMessageAction("Say message", "犬の散歩"),
-}
 
 func main() {
 	port := os.Getenv("PORT")
@@ -57,8 +53,25 @@ func main() {
 						askTitle := "家事選択"
 						// ログインメッセージと家事選択を促す
 						askDoneHousehold := loginMessage + "\n終わった家事を選択してね！"
+						// 「ユーザ名,家事名」の形で送信させる
+						var householdActions = []linebot.TemplateAction{
+							linebot.NewMessageAction("洗濯", replyMessage+",洗濯"),
+							linebot.NewMessageAction("掃除", replyMessage+",掃除"),
+							linebot.NewMessageAction("犬の散歩", replyMessage+",犬の散歩"),
+						}
 						template := linebot.NewButtonsTemplate("", askDoneHousehold, askTitle, householdActions...)
 						bot.ReplyMessage(event.ReplyToken, linebot.NewTemplateMessage(askTitle, template)).Do()
+					} else if checkRegisterMessage(replyMessage) {
+						name := splitMessages(replyMessage)[0]
+						point, err := mypkg.UpdatePoint(name)
+						if err == nil {
+							pointMessage := name + "の家事ポイントは" + strconv.Itoa(point) + "だよ！"
+							_, err := bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(pointMessage)).Do()
+							if err != nil {
+								log.Print(err)
+							}
+						}
+
 					} else {
 						// 上記以外は、不明なメッセージとして返信
 						myMessage.ReplyUndefined(bot, event)
@@ -68,4 +81,29 @@ func main() {
 		}
 	})
 	router.Run(":" + port)
+}
+
+var houseHoldKinds = []string{
+	"洗濯",
+	"掃除",
+	"犬の散歩",
+}
+
+func checkRegisterMessage(message string) bool {
+	splitMessages := splitMessages(message)
+	// 二分割以外は不明なメッセージ
+	if len(splitMessages) != 2 {
+		return false
+	}
+	// 家事名が一つでも一致すればtrue
+	for _, kind := range houseHoldKinds {
+		if kind == splitMessages[1] {
+			return true
+		}
+	}
+	return false
+}
+
+func splitMessages(message string) []string {
+	return strings.Split(message, ",")
 }

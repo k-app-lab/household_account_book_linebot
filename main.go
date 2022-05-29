@@ -3,7 +3,6 @@ package main
 import (
 	"log"
 	"os"
-	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -61,21 +60,23 @@ func main() {
 						}
 						template := linebot.NewButtonsTemplate("", askDoneHousehold, askTitle, householdActions...)
 						bot.ReplyMessage(event.ReplyToken, linebot.NewTemplateMessage(askTitle, template)).Do()
-					} else if checkRegisterMessage(replyMessage) {
-						name := splitMessages(replyMessage)[0]
-						point, err := mypkg.UpdatePoint(name)
-						if err == nil {
-							pointMessage := name + "の家事ポイントは" + strconv.Itoa(point) + "だよ！"
-							_, err := bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(pointMessage)).Do()
-							if err != nil {
-								log.Print(err)
-							}
-						}
-
 					} else {
 						// 上記以外は、不明なメッセージとして返信
 						myMessage.ReplyUndefined(bot, event)
 					}
+					// else if checkRegisterMessage(replyMessage) {
+					// 	name := splitMessages(replyMessage)[0]
+					// 	point, err := mypkg.UpdatePoint(name)
+					// 	if err == nil {
+					// 		pointMessage := name + "の家事ポイントは" + strconv.Itoa(point) + "だよ！"
+					// 		_, err := bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(pointMessage)).Do()
+					// 		if err != nil {
+					// 			log.Print(err)
+					// 		}
+					// 	}
+
+					// }
+
 				}
 			}
 		}

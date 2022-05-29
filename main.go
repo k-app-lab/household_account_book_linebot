@@ -6,15 +6,11 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	myMessage "github.com/ko-app-lab/household_account_book_linebot/my-message"
+	"github.com/ko-app-lab/household_account_book_linebot/mypkg"
 
 	"github.com/line/line-bot-sdk-go/linebot"
 )
-
-var householdActions = []linebot.TemplateAction{
-	linebot.NewMessageAction("洗濯", ",洗濯"),
-	linebot.NewMessageAction("掃除", ",掃除"),
-	linebot.NewMessageAction("犬の散歩", ",犬の散歩"),
-}
 
 func main() {
 	port := os.Getenv("PORT")
@@ -50,19 +46,28 @@ func main() {
 				// メッセージがテキスト形式の場合
 				case *linebot.TextMessage:
 					replyMessage := message.Text
-					// loginMessage, err := mypkg.FetchLoginMessage(replyMessage)
-					// if loginMessage != "" && err == nil {
-					// ログインできたら家事の選択
-					askTitle := "家事選択"
-					// ログインメッセージと家事選択を促す
-					askDoneHousehold := replyMessage + "\n終わった家事を選択してね！"
-					// 「ユーザ名,家事名」の形で送信させる
-					template := linebot.NewButtonsTemplate("", askDoneHousehold, askTitle, householdActions...)
-					bot.ReplyMessage(event.ReplyToken, linebot.NewTemplateMessage(askTitle, template)).Do()
-					// } else {
-					// 上記以外は、不明なメッセージとして返信
-					// myMessage.ReplyUndefined(bot, event)
-					// }
+					loginMessage, err := mypkg.FetchLoginMessage(replyMessage)
+					if loginMessage != "" && err == nil {
+						// // ログインできたら家事の選択
+						// askTitle := "家事選択"
+						// // ログインメッセージと家事選択を促す
+						// askDoneHousehold := loginMessage + "\n終わった家事を選択してね！"
+						// // 「ユーザ名,家事名」の形で送信させる
+						// var householdActions = []linebot.TemplateAction{
+						// 	linebot.NewMessageAction("洗濯", replyMessage+",洗濯"),
+						// 	linebot.NewMessageAction("掃除", replyMessage+",掃除"),
+						// 	linebot.NewMessageAction("犬の散歩", replyMessage+",犬の散歩"),
+						// }
+						// template := linebot.NewButtonsTemplate("", askDoneHousehold, askTitle, householdActions...)
+						// bot.ReplyMessage(event.ReplyToken, linebot.NewTemplateMessage(askTitle, template)).Do()
+						_, err := bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(loginMessage)).Do()
+						if err != nil {
+							log.Print(err)
+						}
+					} else {
+						// 上記以外は、不明なメッセージとして返信
+						myMessage.ReplyUndefined(bot, event)
+					}
 					// else if checkRegisterMessage(replyMessage) {
 					// 	name := splitMessages(replyMessage)[0]
 					// 	point, err := mypkg.UpdatePoint(name)

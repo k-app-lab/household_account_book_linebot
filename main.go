@@ -46,7 +46,14 @@ func main() {
 					replyMessage := message.Text
 					loginMessage, err := mypkg.FetchLoginMessage(replyMessage)
 					if loginMessage != "" && err == nil {
+						// ログイン時のメッセージ表示
 						bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(loginMessage)).Do()
+						// ログインできたら家事の選択
+						askTitle := "家事の選択"
+						askDoneHousehold := "終わった家事を選択肢てね！"
+						template := linebot.NewButtonsTemplate("", askDoneHousehold, askTitle, linebot.NewPostbackAction("言 hello2", "hello こんにちは", "hello こんにちは", ""), linebot.NewMessageAction("Say message", "Rice=米"))
+						bot.ReplyMessage(event.ReplyToken,
+							linebot.NewTemplateMessage(askTitle, template)).Do()
 					} else {
 						// 上記意外は、おうむ返しで返信
 						_, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(replyMessage)).Do()

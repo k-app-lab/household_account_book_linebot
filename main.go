@@ -79,7 +79,7 @@ func receiveLineApiEvents(bot *linebot.Client, event *linebot.Event) {
 			}
 			var pointsMessage string = ""
 			for _, user := range users {
-				pointsMessage += user.Name + "のポイントは" + strconv.Itoa(user.Point) + "だよ"
+				pointsMessage += user.Name + "のポイントは" + strconv.Itoa(user.Point) + "だよ\n"
 			}
 			_, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(pointsMessage)).Do()
 			if err != nil {

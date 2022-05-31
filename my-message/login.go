@@ -10,7 +10,6 @@ func ReplyLogin(bot *linebot.Client, event *linebot.Event, replyMessage string) 
 	loginMessage, err := mypkg.FetchLoginMessage(replyMessage)
 	if loginMessage == "" || err != nil {
 		// 登録されていないユーザ名が来た
-		bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("登録されていないユーザだよ")).Do()
 		return false
 	}
 	userName := replyMessage

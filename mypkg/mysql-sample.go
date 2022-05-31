@@ -103,7 +103,7 @@ func FetchUsers() ([]User, error) {
 	defer db.Close()
 
 	// nameで検索する
-	cmd := "select point from login;"
+	cmd := "select * from login;"
 	rows, err := db.Query(cmd)
 	if err != nil {
 		log.Fatalln("クエリ取得失敗", err)

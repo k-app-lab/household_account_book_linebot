@@ -53,34 +53,43 @@ func main() {
 
 		for _, event := range events {
 			// イベントがメッセージの受信だった場合
-			if event.Type == linebot.EventTypeMessage {
-				switch message := event.Message.(type) {
-				// メッセージがテキスト形式の場合
-				case *linebot.TextMessage:
-					replyMessage := message.Text
-					// ログイン時の返信
-					myMessage.ReplyLogin(bot, event, replyMessage)
-					// 「ユーザ名,操作」の形かチェック
-					if checkRegisterMessage(replyMessage) {
-						name := splitMessages(replyMessage)[0]
-						point, err := mypkg.UpdatePoint(name)
-						if err == nil {
-							pointMessage := name + "の家事ポイントは" + strconv.Itoa(point) + "ptだよ！"
-							_, err := bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(pointMessage)).Do()
-							if err != nil {
-								log.Print(err)
-							}
-						}
-
-					} else {
-						// 上記以外は、不明なメッセージとして返信
-						myMessage.ReplyUndefined(bot, event)
-					}
-				}
-			}
+			receiveLineApiEvents(bot, event)
 		}
 	})
 	router.Run(":" + port)
+}
+
+func receiveLineApiEvents(bot *linebot.Client, event *linebot.Event) {
+	if event.Type != linebot.EventTypeMessage {
+		// イベントがメッセージの受信以外は何もしない
+		return
+	}
+	switch message := event.Message.(type) {
+	// メッセージがテキスト形式の場合
+	case *linebot.TextMessage:
+		replyMessage := message.Text
+		if myMessage.ReplyLogin(bot, event, replyMessage) {
+			// ログインが成功したときはここで返す
+			return
+		}
+		// 「ユーザ名,操作」の形かチェック
+		if checkRegisterMessage(replyMessage) {
+			name := splitMessages(replyMessage)[0]
+			point, err := mypkg.UpdatePoint(name)
+			if err != nil {
+				return
+			}
+			pointMessage := name + "の家事ポイントは" + strconv.Itoa(point) + "ptだよ！"
+			_, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(pointMessage)).Do()
+			if err != nil {
+				log.Print(err)
+			}
+
+		} else {
+			// 上記以外は、不明なメッセージとして返信
+			myMessage.ReplyUndefined(bot, event)
+		}
+	}
 }
 
 var houseHoldKinds = []string{

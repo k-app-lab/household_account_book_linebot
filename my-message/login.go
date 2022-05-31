@@ -6,10 +6,11 @@ import (
 )
 
 // ログイン時に行いたいことを選択させる
-func ReplyLogin(bot *linebot.Client, event *linebot.Event, replyMessage string) {
+func ReplyLogin(bot *linebot.Client, event *linebot.Event, replyMessage string) bool {
 	loginMessage, err := mypkg.FetchLoginMessage(replyMessage)
 	if loginMessage == "" || err != nil {
-		return
+		// 登録されていないユーザ名が来た
+		return false
 	}
 	// ログインメッセージとやりたいことの選択を促す
 	askDoneHousehold := loginMessage + "\nやりたいことを選択してね！"
@@ -19,4 +20,5 @@ func ReplyLogin(bot *linebot.Client, event *linebot.Event, replyMessage string) 
 	}
 	template := linebot.NewButtonsTemplate("", askDoneHousehold, "", operationActions...)
 	bot.ReplyMessage(event.ReplyToken, linebot.NewTemplateMessage("", template)).Do()
+	return true
 }

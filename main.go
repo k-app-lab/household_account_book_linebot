@@ -36,7 +36,6 @@ func main() {
 	for _, user := range users {
 		fmt.Println(user)
 	}
-	fmt.Println()
 
 	router := gin.New()
 	router.Use(gin.Logger())

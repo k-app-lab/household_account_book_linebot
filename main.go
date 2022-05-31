@@ -72,6 +72,21 @@ func receiveLineApiEvents(bot *linebot.Client, event *linebot.Event) {
 			// ログインが成功したときはここで返す
 			return
 		}
+		if replyMessage == "家事ポイント確認" {
+			users, err := mypkg.FetchUsers()
+			if err != nil {
+				return
+			}
+			var pointsMessage string = ""
+			for _, user := range users {
+				pointsMessage += user.Name + "のポイントは" + strconv.Itoa(user.Point) + "だよ"
+			}
+			_, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(pointsMessage)).Do()
+			if err != nil {
+				log.Print(err)
+			}
+			return
+		}
 		// 「ユーザ名,操作」の形かチェック
 		if checkRegisterMessage(replyMessage) {
 			name := splitMessages(replyMessage)[0]
@@ -84,7 +99,6 @@ func receiveLineApiEvents(bot *linebot.Client, event *linebot.Event) {
 			if err != nil {
 				log.Print(err)
 			}
-
 		} else {
 			// 上記以外は、不明なメッセージとして返信
 			myMessage.ReplyUndefined(bot, event)

@@ -55,7 +55,7 @@ func FetchLoginMessage(key string) (string, error) {
 	return user.Message, nil
 }
 
-// 入力した文字列でクエリを検索する
+// 指定したユーザのポイントを取得する
 func UpdatePoint(name string) (int, error) {
 	// DBと接続
 	db, err := sql.Open("postgres", os.Getenv("DATABASE_URL"))
@@ -90,4 +90,40 @@ func UpdatePoint(name string) (int, error) {
 		return 0, err
 	}
 	return addPoint, nil
+}
+
+// 全員のユーザデータを取得
+func FetchUsers() ([]User, error) {
+	// DBと接続
+	db, err := sql.Open("postgres", os.Getenv("DATABASE_URL"))
+	if err != nil {
+		log.Fatalln("接続失敗", err)
+		return make([]User, 0), err
+	}
+	defer db.Close()
+
+	// nameで検索する
+	cmd := "select point from login;"
+	rows, err := db.Query(cmd)
+	if err != nil {
+		log.Fatalln("クエリ取得失敗", err)
+		return make([]User, 0), err
+	}
+	defer rows.Close()
+	var users []User
+	for rows.Next() {
+		var tmp User
+		err := rows.Scan(&tmp.Id, &tmp.Name, &tmp.Message, &tmp.Point)
+		if err != nil {
+			log.Fatal(err)
+			return make([]User, 0), err
+		}
+		users = append(users, tmp)
+	}
+	err = rows.Err()
+	if err != nil {
+		log.Fatal(err)
+		return make([]User, 0), err
+	}
+	return users, nil
 }

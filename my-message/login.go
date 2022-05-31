@@ -14,12 +14,13 @@ func ReplyLogin(bot *linebot.Client, event *linebot.Event, replyMessage string) 
 		return false
 	}
 	// ログインメッセージとやりたいことの選択を促す
-	askDoneHousehold := loginMessage + "\nやりたいことを選択してね！"
-	var operationActions = []linebot.TemplateAction{
-		linebot.NewMessageAction("終わった家事を登録", replyMessage+",終了した家事登録"),
-		linebot.NewMessageAction("みんなの家事ポイント確認", "家事ポイント確認"),
-	}
-	template := linebot.NewButtonsTemplate("", askDoneHousehold, "", operationActions...)
-	bot.ReplyMessage(event.ReplyToken, linebot.NewTemplateMessage("", template)).Do()
+	// askDoneHousehold := loginMessage + "\nやりたいことを選択してね！"
+	// var operationActions = []linebot.TemplateAction{
+	// 	linebot.NewMessageAction("終わった家事を登録", replyMessage+",終了した家事登録"),
+	// 	linebot.NewMessageAction("みんなの家事ポイント確認", "家事ポイント確認"),
+	// }
+	// template := linebot.NewButtonsTemplate("", askDoneHousehold, "", operationActions...)
+	// bot.ReplyMessage(event.ReplyToken, linebot.NewTemplateMessage("", template)).Do()
+	bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(loginMessage)).Do()
 	return true
 }

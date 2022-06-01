@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"strconv"
@@ -10,7 +9,6 @@ import (
 	"github.com/gin-gonic/gin"
 	mydb "github.com/ko-app-lab/household_account_book_linebot/my-database"
 	myMessage "github.com/ko-app-lab/household_account_book_linebot/my-message"
-	"github.com/ko-app-lab/household_account_book_linebot/mypkg"
 
 	"github.com/line/line-bot-sdk-go/linebot"
 )
@@ -26,15 +24,6 @@ func main() {
 	)
 	if err != nil {
 		log.Fatal(err)
-	}
-
-	// 登録されているユーザ名を取得する
-	users, err := mydb.FetchUserName()
-	if err != nil {
-		log.Fatal(err)
-	}
-	for _, user := range users {
-		fmt.Println(user)
 	}
 
 	router := gin.New()
@@ -73,7 +62,7 @@ func receiveLineApiEvents(bot *linebot.Client, event *linebot.Event) {
 			return
 		}
 		if replyMessage == "家事ポイント確認" {
-			users, err := mypkg.FetchUsers()
+			users, err := mydb.FetchUsers()
 			if err != nil {
 				return
 			}
@@ -95,7 +84,7 @@ func receiveLineApiEvents(bot *linebot.Client, event *linebot.Event) {
 			if operation == "終了した家事登録" {
 				myMessage.ReplyHouseholdRegister(bot, event, name)
 			} else {
-				point, err := mypkg.UpdatePoint(name)
+				point, err := mydb.UpdatePoint(name)
 				if err != nil {
 					return
 				}
@@ -113,6 +102,7 @@ func receiveLineApiEvents(bot *linebot.Client, event *linebot.Event) {
 	}
 }
 
+// TODO: このへんもDBで管理する
 var houseHoldType = []string{
 	"洗濯",
 	"掃除",

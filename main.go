@@ -137,7 +137,7 @@ func splitMessages(message string) []string {
 }
 
 // 配列に指定した要素が含まれるか
-func contains[T comparable](array []T, target T) bool {
+func contains(array []string, target string) bool {
 	for _, element := range array {
 		if element == target {
 			return true

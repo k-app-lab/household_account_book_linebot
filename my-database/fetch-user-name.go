@@ -15,7 +15,7 @@ type User struct {
 	Point   int
 }
 
-// 入力した文字列でクエリを検索する
+// 全てのユーザ名を取得する
 func FetchUserName() ([]string, error) {
 	// DBと接続
 	db, err := sql.Open("postgres", os.Getenv("DATABASE_URL"))

@@ -35,13 +35,13 @@ func FetchUserName() ([]string, error) {
 	defer rows.Close()
 
 	var names []string
-	var tmp string
 	for rows.Next() {
+		var tmp string
 		err := rows.Scan(&tmp)
 		if err != nil {
 			return []string{}, err
 		}
-		names = append(names)
+		names = append(names, tmp)
 	}
 	err = rows.Err()
 	if err != nil {

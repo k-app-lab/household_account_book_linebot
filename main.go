@@ -88,17 +88,24 @@ func receiveLineApiEvents(bot *linebot.Client, event *linebot.Event) {
 			return
 		}
 		// 「ユーザ名,操作」の形かチェック
-		if checkRegisterMessage(replyMessage) {
-			name := splitMessages(replyMessage)[0]
-			point, err := mypkg.UpdatePoint(name)
-			if err != nil {
-				return
+		if isUserOperationMessage(replyMessage) {
+			split := splitMessages(replyMessage)
+			name := split[0]
+			operation := split[1]
+			if operation == "終了した家事登録" {
+				myMessage.ReplyHouseholdRegister(bot, event, name)
+			} else {
+				point, err := mypkg.UpdatePoint(name)
+				if err != nil {
+					return
+				}
+				pointMessage := name + "の家事ポイントは" + strconv.Itoa(point) + "ptだよ！"
+				_, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(pointMessage)).Do()
+				if err != nil {
+					log.Print(err)
+				}
 			}
-			pointMessage := name + "の家事ポイントは" + strconv.Itoa(point) + "ptだよ！"
-			_, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(pointMessage)).Do()
-			if err != nil {
-				log.Print(err)
-			}
+
 		} else {
 			// 上記以外は、不明なメッセージとして返信
 			myMessage.ReplyUndefined(bot, event)
@@ -106,21 +113,35 @@ func receiveLineApiEvents(bot *linebot.Client, event *linebot.Event) {
 	}
 }
 
-var houseHoldKinds = []string{
+var houseHoldType = []string{
 	"洗濯",
 	"掃除",
 	"犬の散歩",
 }
 
-func checkRegisterMessage(message string) bool {
+// 「ユーザ名,操作」の形かチェック
+func isUserOperationMessage(message string) bool {
 	splitMessages := splitMessages(message)
-	// 二分割以外は不明なメッセージ
+	users, err := mydb.FetchUserName()
+	if err != nil {
+		return false
+	}
 	if len(splitMessages) != 2 {
 		return false
 	}
-	return false
+	return contains(users, splitMessages[0])
 }
 
 func splitMessages(message string) []string {
 	return strings.Split(message, ",")
+}
+
+// 配列に指定した要素が含まれるか
+func contains[T comparable](array []T, target T) bool {
+	for _, element := range array {
+		if element == target {
+			return true
+		}
+	}
+	return false
 }
